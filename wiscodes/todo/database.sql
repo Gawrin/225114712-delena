@@ -7,3 +7,5 @@ CREATE TABLE tasks (
     description TEXT,
     status ENUM('pending', 'completed') DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+
+ALTER TABLE tasks ADD COLUMN IF NOT EXISTS status ENUM('pending', 'completed') DEFAULT 'pending';

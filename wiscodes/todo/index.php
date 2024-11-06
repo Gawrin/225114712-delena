@@ -3,6 +3,16 @@ require_once 'db.php';
 
 $stmt = $conn->query("SELECT * FROM tasks ORDER BY created_at DESC");
 $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Calculate progress
+$total_tasks = count($tasks);
+$completed_tasks = 0;
+foreach($tasks as $task) {
+    if($task['status'] === 'completed') {
+        $completed_tasks++;
+    }
+}
+$progress_percentage = $total_tasks > 0 ? round(($completed_tasks / $total_tasks) * 100) : 0;
 ?>
 
 <!DOCTYPE html>
@@ -114,21 +124,114 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 font-size: 14px;
             }
         }
+
+        .completed {
+            opacity: 0.7;
+        }
+        .completed h3 {
+            text-decoration: line-through;
+        }
+        .status {
+            color: var(--neon-green);
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        .status-btn {
+            background-color: var(--neon-green) !important;
+            color: var(--midnight-black) !important;
+        }
+
+        /* Add these new styles */
+        .progress-container {
+            background: #2a2a2a;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            background: #333;
+            height: 25px;
+            border-radius: 12.5px;
+            position: relative;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            background: var(--neon-green);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        
+        .checkmark {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--neon-green);
+            border-radius: 50%;
+            margin-right: 10px;
+            position: relative;
+        }
+        
+        .completed .checkmark::after {
+            content: '✓';
+            position: absolute;
+            color: var(--neon-green);
+            font-size: 14px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .task-header {
+            display: flex;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Todo List</h1>
+        
+        <!-- Add Progress Bar -->
+        <div class="progress-container">
+            <h3>Progress</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: <?= $progress_percentage ?>%"></div>
+                <div class="progress-text"><?= $progress_percentage ?>% Complete</div>
+            </div>
+            <p><?= $completed_tasks ?> of <?= $total_tasks ?> tasks completed</p>
+        </div>
+
         <a href="add.php" class="add-btn">Add New Task</a>
         
         <div class="task-list">
             <?php foreach($tasks as $task): ?>
-                <div class="task-item">
+                <div class="task-item <?= $task['status'] === 'completed' ? 'completed' : '' ?>">
                     <div>
-                        <h3><?= htmlspecialchars($task['title']) ?></h3>
+                        <div class="task-header">
+                            <span class="checkmark"></span>
+                            <h3><?= htmlspecialchars($task['title']) ?></h3>
+                        </div>
                         <p><?= htmlspecialchars($task['description']) ?></p>
+                        <p class="status">Status: <?= ucfirst($task['status']) ?></p>
                     </div>
                     <div>
+                        <a href="update_status.php?id=<?= $task['id'] ?>&status=<?= $task['status'] === 'pending' ? 'completed' : 'pending' ?>" 
+                           class="action-btn status-btn">
+                           <?= $task['status'] === 'pending' ? 'Mark Complete' : 'Mark Pending' ?>
+                        </a>
                         <a href="edit.php?id=<?= $task['id'] ?>" class="action-btn">Edit</a>
                         <a href="delete.php?id=<?= $task['id'] ?>" class="action-btn" onclick="return confirm('Are you sure?')">Delete</a>
                     </div>

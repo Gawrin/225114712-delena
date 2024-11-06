@@ -60,6 +60,60 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
             margin-left: 5px;
             cursor: pointer;
         }
+
+        /* Add these media queries at the end of the style block */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 10px;
+                margin: 0 10px;
+            }
+
+            .task-list {
+                padding: 10px;
+            }
+
+            .task-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .task-item div:last-child {
+                width: 100%;
+                display: flex;
+                gap: 10px;
+            }
+
+            .action-btn {
+                flex: 1;
+                text-align: center;
+                padding: 10px;
+                font-size: 16px;
+            }
+
+            .add-btn {
+                display: block;
+                width: 100%;
+                text-align: center;
+                padding: 15px;
+                font-size: 16px;
+            }
+
+            h1 {
+                font-size: 24px;
+                margin-bottom: 15px;
+            }
+
+            h3 {
+                margin: 0 0 5px 0;
+                font-size: 18px;
+            }
+
+            p {
+                margin: 0;
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
